@@ -1,25 +1,22 @@
-# Warung Pintar DevOps Project
+# Simple Web Deployment Pipeline
 
-## Business Context
+## Overview & Problem Statement
 
-A small-to-medium B2B company provides a web-based stock management 
-and cashier platform for local small businesses (UMKM) in Indonesia. 
-The company currently serves 200 active merchant clients daily. Their 
-technical team consists of a few developers and designers, with no 
-dedicated DevOps engineer.
+This project provides an automated, reliable deployment and monitoring pipeline for containerized web applications, designed for small-to-medium workloads on cost-efficient cloud infrastructure.
 
-Several critical problems emerged:
-- Deployments were done manually, causing frequent mismatches between 
-  development and production environments
-- No rollback mechanism when a bad deployment occurred
-- No monitoring system to proactively detect server issues — problems 
-  were only discovered after merchants complained
+Deploying web applications manually often introduces critical operational issues:
+- **Environment Drift & Downtime:** Manual server configurations lead to inconsistencies between development and production environments.
+- **High-Risk Releases:** No safety net or rollback mechanism when an update introduces breaking changes or runtime bugs.
+- **Blind Operations:** No visibility into server resource usage or container health until failures occur.
 
-These issues caused unnecessary downtime and wasted developer time 
-that should have been spent building features.
+---
 
-The company brought in a DevOps engineer to solve these problems under 
-two key constraints: a limited budget and a one-week deadline.
+## Key Benefits & Solutions
+
+1. **Automated CI/CD:** Pushing to the main branch automatically builds and deploys the latest container via GitHub Actions, eliminating manual server intervention.
+2. **Instant Rollback:** Enables immediate reversion to previous working versions using tagged Docker images without rebuild time.
+3. **Proactive Monitoring:** Real-time visibility into CPU, memory, and container metrics using Netdata.
+4. **Cost Efficiency:** Production-ready setup with reverse proxy (Nginx) and SSL, capable of running smoothly on minimal infrastructure (AWS Free Tier).
 
 ---
 
@@ -103,6 +100,9 @@ the updated version.
 ### Project Structure
 ```
 .
+├── .github
+│   └── workflows
+│       └── deploy.yml
 ├── README.md
 ├── app
 │   ├── app.py
@@ -111,7 +111,9 @@ the updated version.
 ├── docker
 │   └── Dockerfile
 ├── documentation
-└── nginx
+└── script
+    ├── restore-latest.sh
+    └── rollback.sh
 ```
 
 ### Prerequisites
@@ -124,8 +126,8 @@ the updated version.
 
 1. Clone the repository
 ```bash
-git clone https://github.com/karasu126/warung-pintar-devops.git
-cd warung-pintar-devops
+git clone https://github.com/luqman126/simple-web-deployment-pipeline.git
+cd simple-web-deployment-pipeline
 ```
 
 2. Create and activate virtual environment
@@ -184,7 +186,7 @@ Metrics monitored include:
 ## Rollback Mechanism
 
 Each deployment builds a Docker image tagged with the Git commit hash — 
-for example `warung-app:a3f2c9d`. Every successful deployment appends 
+for example `web-app:a3f2c9d`. Every successful deployment appends 
 the commit hash to `version_history.txt` on the server, creating a 
 traceable record of all deployed versions.
 
@@ -203,12 +205,12 @@ Two scripts are available in the `script/` directory:
 
 **Rollback to previous version:**
 ```bash
-ssh -i key.pem ubuntu@EC2_HOST "bash ~/warung-pintar-devops/script/rollback.sh"
+ssh -i key.pem ubuntu@EC2_HOST "bash ~/simple-web-deployment-pipeline/script/rollback.sh"
 ```
 
 **Restore to latest version:**
 ```bash
-ssh -i key.pem ubuntu@EC2_HOST "bash ~/warung-pintar-devops/script/restore-latest.sh"
+ssh -i key.pem ubuntu@EC2_HOST "bash ~/simple-web-deployment-pipeline/script/restore-latest.sh"
 ```
 
 ### Evidence
@@ -237,4 +239,4 @@ Version history on server:
 - **Image registry** — push Docker images to Docker Hub or AWS ECR 
   to decouple build and deploy stages
 - **Kubernetes** — migrate container orchestration to Kubernetes for 
-  better scalability and resilience as merchant count grows
+  better scalability and resilience as user traffic grows

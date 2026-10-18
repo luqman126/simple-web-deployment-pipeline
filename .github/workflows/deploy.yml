@@ -1,4 +1,4 @@
-name: warung-app-pipeline
+name: deploy-pipeline
 
 on: 
     push:
@@ -22,17 +22,17 @@ jobs:
                 chmod 600 key.pem
 
                 ssh -i key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST '
-                  cd ~/warung-pintar-devops &&
+                  cd ~/simple-web-deployment-pipeline &&
                   git pull origin '"${{ github.ref_name }}"' &&
 
                   COMMIT_HASH=$(git rev-parse --short HEAD) &&
 
-                  docker build -t warung-app:$COMMIT_HASH -t warung-app:latest -f docker/Dockerfile . &&
+                  docker build -t web-app:$COMMIT_HASH -t web-app:latest -f docker/Dockerfile . &&
 
-                  docker stop warung-app || true &&
-                  docker rm warung-app || true &&
+                  docker stop web-app || true &&
+                  docker rm web-app || true &&
 
-                  docker run -d --name warung-app -p 8080:5000 --restart unless-stopped warung-app:latest &&
+                  docker run -d --name web-app -p 8080:5000 --restart unless-stopped web-app:latest &&
                   
-                  echo "$COMMIT_HASH" >> ~/warung-pintar-devops/script/version_history.txt 
+                  echo "$COMMIT_HASH" >> ~/simple-web-deployment-pipeline/script/version_history.txt 
                 '

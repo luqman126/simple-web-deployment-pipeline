@@ -1,7 +1,7 @@
 #!/bin/bash
 # Rollback script to revert to the previous commit
 
-PREVIOUS_COMMIT=$(tail -2 ~/warung-pintar-devops/script/version_history.txt | head -1)
+PREVIOUS_COMMIT=$(tail -2 ~/simple-web-deployment-pipeline/script/version_history.txt | head -1)
 
 if [ -z "$PREVIOUS_COMMIT" ]; then
     echo "Error: No previous commit found in version history"
@@ -9,14 +9,14 @@ if [ -z "$PREVIOUS_COMMIT" ]; then
 fi
 
 echo "Rolling back to commit: $PREVIOUS_COMMIT"
-docker stop warung-app 2>/dev/null || true
-docker rm warung-app 2>/dev/null || true
+docker stop web-app 2>/dev/null || true
+docker rm web-app 2>/dev/null || true
 
 docker run -d \
-    --name warung-app \
+    --name web-app \
     --restart unless-stopped \
     -p 8080:5000 \
-    warung-app:"$PREVIOUS_COMMIT"
+    web-app:"$PREVIOUS_COMMIT"
 
 if [ $? -eq 0 ]; then
     echo "Rollback successful"

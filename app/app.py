@@ -4,7 +4,7 @@ myapp  = Flask(__name__)
 
 @myapp.route('/', methods=['GET'])
 def welcome():
-    return 'Warung Pintar API — production-ready Flask service with automated CI/CD pipeline, Docker containerization, and rollback mechanism. Built on AWS EC2 with Nginx reverse proxy and HTTPS. (Luqman, 2026)'
+    return 'Flask Web Service — production-ready service with automated CI/CD pipeline, Docker containerization, and rollback mechanism. Built on AWS EC2 with Nginx reverse proxy and HTTPS. (Luqman, 2026)'
 
 @myapp.route('/health', methods=['GET'])
 def health():
